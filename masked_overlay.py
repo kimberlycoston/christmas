@@ -54,13 +54,18 @@ video_out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
 mask_3ch = cv2.merge([mask, mask, mask])
 
 for frame in frames:
+    # Set all black pixels (background) to transparent-like dim black
     masked = cv2.bitwise_and(frame, mask_3ch)
-    video_out.write(masked)
+    black_background = np.zeros_like(masked)
+    output_frame = np.where(mask_3ch > 0, masked, black_background)
+
+    video_out.write(output_frame)
 
     if fullscreen_preview:
-        cv2.namedWindow("Projection", cv2.WND_PROP_FULLSCREEN)
-        cv2.setWindowProperty("Projection", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-        cv2.imshow("Projection", masked)
+        cv2.namedWindow("Projection", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Projection", width, height)
+        cv2.moveWindow("Projection", 1920, 0)
+        cv2.imshow("Projection", output_frame)
         key = cv2.waitKey(int(1000 / fps))
         if key == 27:  # ESC to stop
             break
