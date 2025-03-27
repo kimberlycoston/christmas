@@ -6,7 +6,7 @@ erasing = False
 last_point = None
 
 # Load the mask as grayscale and convert to color for drawing
-img = cv2.imread("mask.png", cv2.IMREAD_GRAYSCALE)
+img = cv2.imread("mask_dynamic.png", cv2.IMREAD_GRAYSCALE)
 img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
 def mouse_events(event, x, y, flags, param):

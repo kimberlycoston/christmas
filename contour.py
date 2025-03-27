@@ -7,7 +7,7 @@ from ultralytics import YOLO
 # GLOBAL SETUP
 # ===============================
 model = YOLO("best.pt")
-image_path = "test_image2.jpeg"
+image_path = "mom_house.png"
 original_img = cv2.imread(image_path)
 original_height, original_width = original_img.shape[:2]
 resized_img = cv2.resize(original_img, (640, 640))
@@ -185,10 +185,10 @@ while True:
             if len(cnt) > 3:
                 undo_stack.append(list(all_contours))
                 cnt = np.delete(cnt, selected_point_idx, axis=0)
-                selected_point_idx = -1
-                selected_contour_idx = -1
                 all_contours[selected_contour_idx] = (cnt, class_name)
                 print("❌ Deleted point from contour")
             selected_point_idx = -1
+            selected_contour_idx = -1
+
 
 cv2.destroyAllWindows()
