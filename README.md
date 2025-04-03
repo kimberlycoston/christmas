@@ -3,7 +3,7 @@ cd existing_repo
 git remote add origin https://gitlab.oit.duke.edu/coston_individual2_aipi590/coston_individual2_aipi590.git
 git branch -M main
 git push -uf origin main
-```# Christmas in a Box
+# Christmas in a Box
 
 A festive, plug-and-play projection mapping system that lights up your home—without the hassle, cost, or danger of traditional holiday lights.
 
