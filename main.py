@@ -2,35 +2,35 @@
 from gpiozero import Button
 from gpiozero.pins.pigpio import PiGPIOFactory
 import threading
-from control_module.door_control import open_door, close_door, get_current_time, show_boot_message
-from vision_module.vision import capture_image
+from control_module.control import open_door, close_door, get_current_time, show_boot_message, time_until_event, lcd_message, setup_test_button, shutdown
+# from vision_module.vision import capture_image
+from vision_module.yolo_utils import run_yolo
+from vision_module.capture_utils import capture_image
+from vision_module.ui_utils import show_preview
+from vision_module.edit_utils import edit_mask_interactively
+from vision_module.edit_utils import edit_mask_interactively
+
 import time
 
-factory = PiGPIOFactory()
-
-# Buttons
-door_button = Button(22, pull_up=True, pin_factory=factory, bounce_time=0.2)
-photo_button = Button(23, pull_up=True, pin_factory=factory, bounce_time=0.2)
-
+# State flags for door
 opened = False
 closed = False
 
-def handle_door_press():
-    global opened, closed
-    if not opened:
-        open_door()
-        opened = True
-        closed = False
-    else:
-        close_door()
-        closed = True
-        opened = False
+# Set up PiGPIO
+factory = PiGPIOFactory()
+
+# Set up photo button
+photo_button = Button(23, pull_up=True, pin_factory=factory, bounce_time=0.2)
 
 def handle_photo_press():
     print("📷 Button pressed to capture image")
-    capture_image()
+    image = capture_image()
+    contours, class_names = run_yolo(image)
+    print(f"✅ Found {len(contours)} object(s)")
+    show_preview(image, contours, class_names)
+    # Optional: Launch UI to allow user to clean up mask, unsure to show in demo or not?
+    edit_mask_interactively("mask_dynamic.png", "mask_edited.png")
 
-door_button.when_pressed = handle_door_press
 photo_button.when_pressed = handle_photo_press
 
 def rtc_loop():
@@ -49,12 +49,27 @@ def rtc_loop():
             closed = True
             opened = False
 
+        # Display countdown on LCD
+        if 6 <= hour < 18:
+            hrs, mins = time_until_event(now, 18)
+            lcd_message("Open in:", f"{hrs:02}h {mins:02}m remains")
+        else:
+            hrs, mins = time_until_event(now, 6)
+            lcd_message("Magic sleeps in:", f"{hrs:02}h {mins:02}m")
+
         time.sleep(20)
 
-# Start up
-show_boot_message()
-threading.Thread(target=rtc_loop, daemon=True).start()
+try:
+    show_boot_message()
+    setup_test_button()  # ✅ This sets up the demo test button on GPIO 22
+    threading.Thread(target=rtc_loop, daemon=True).start()
 
-# Your OpenCV interface can go here if needed too
-while True:
-    time.sleep(1)  # Keeps the main loop alive
+    # Keep main thread alive
+    while True:
+        time.sleep(1)
+
+except KeyboardInterrupt:
+    print("Shutting down...")
+    lcd_message("Shutting down...")
+    time.sleep(1)
+    shutdown()  # ✅ calls cleanup from control.py
