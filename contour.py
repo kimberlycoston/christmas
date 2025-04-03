@@ -7,7 +7,7 @@ from ultralytics import YOLO
 # GLOBAL SETUP
 # ===============================
 model = YOLO("best.pt")
-image_path = "mom_house.png"
+image_path = "mom_house_final.png"
 original_img = cv2.imread(image_path)
 original_height, original_width = original_img.shape[:2]
 resized_img = cv2.resize(original_img, (640, 640))
@@ -159,8 +159,8 @@ while True:
     key = cv2.waitKey(50)
 
     if key == ord("s"):
-        cv2.imwrite("mask_dynamic.png", mask_img)
-        cv2.imwrite("overlay_dynamic.png", overlay_img)
+        cv2.imwrite("mask_dynamic_final.png", mask_img)
+        cv2.imwrite("overlay_dynamic_final.png", overlay_img)
         print("✅ Saved mask and overlay.")
     elif key == 27:
         break
