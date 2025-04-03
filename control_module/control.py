@@ -83,7 +83,7 @@ def open_door():
     print("Opening door...")
     lcd_message("Opening door...")
     servo.value = 0.08
-    sleep(2.3)
+    sleep(2.1)
     servo.value = 0
     sleep(0.3)
     servo.detach()
@@ -94,8 +94,8 @@ def open_door():
 def close_door():
     print("Closing door...")
     lcd_message("Closing door...")
-    servo.value = -0.08
-    sleep(2.3)
+    servo.value = -0.11
+    sleep(2.6)
     servo.value = 0
     sleep(0.3)
     servo.detach()

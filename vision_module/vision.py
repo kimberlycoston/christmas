@@ -2,15 +2,23 @@ import cv2
 import numpy as np
 import colorsys
 from ultralytics import YOLO
+from gpiozero import Servo, Button
+from gpiozero.pins.pigpio import PiGPIOFactory
+from time import sleep
+
+
+factory = PiGPIOFactory()
+
 
 # ===============================
 # GLOBAL SETUP
 # ===============================
 model = YOLO("best.pt")
-image_path = "mom_house_final.png"
-original_img = cv2.imread(image_path)
-original_height, original_width = original_img.shape[:2]
-resized_img = cv2.resize(original_img, (640, 640))
+# image_path = "mom_house_final.png"
+# original_img = cv2.imread(image_path)
+# original_img = capture_image()
+# original_height, original_width = original_img.shape[:2]
+# resized_img = cv2.resize(original_img, (640, 640))
 
 window_name = "Preview"
 current_conf = 0.6
@@ -20,6 +28,37 @@ selected_point_idx = -1
 is_dragging = False
 last_slider_conf = -1  # to detect slider changes
 undo_stack = []
+
+# Take a live picture from the Pi camera
+def capture_image():
+    cap = cv2.VideoCapture(0)  # 0 = default Pi camera
+    sleep(2)  # Give time for camera to warm up
+    ret, frame = cap.read()
+    cap.release()
+    if ret:
+        cv2.imwrite("captured_image.jpg", frame)
+        print("📷 Photo button pressed — running YOLO again")
+        return frame
+    else:
+        raise Exception("Failed to capture image")
+    
+original_img = capture_image()
+original_height, original_width = original_img.shape[:2]
+resized_img = cv2.resize(original_img, (640, 640))
+
+# Button setup to take a photo
+photo_button = Button(23, pull_up=True, pin_factory=factory, bounce_time=0.2)
+
+def handle_photo_press():
+    print("📸 Taking photo!")
+    global original_img, resized_img, original_height, original_width
+    original_img = capture_image()
+    original_height, original_width = original_img.shape[:2]
+    resized_img = cv2.resize(original_img, (640, 640))
+    update_contours(current_conf)
+
+photo_button.when_pressed = handle_photo_press
+
 
 # Helper: Generate consistent colors
 
