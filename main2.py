@@ -6,9 +6,8 @@ from control_module.control import open_door, close_door, get_current_time, show
 # from vision_module.vision import capture_image
 from vision_module.yolo_utils import run_yolo
 from vision_module.capture_utils import capture_image
-from vision_module.ui_utils import launch_editor
+from vision_module.ui_utils import show_preview
 from vision_module.edit_utils import edit_mask_interactively
-
 
 import time
 
@@ -23,9 +22,22 @@ factory = PiGPIOFactory()
 photo_button = Button(21, pull_up=True, pin_factory=factory, bounce_time=0.2)
 
 def handle_photo_press():
-    print("📷 Button pressed to capture image")
-    image = capture_image()
-    launch_editor(image, initial_conf=0.6)
+    print("📷 Button pressed to simulate capture (DEMO MODE)")
+
+    # Normally: image = capture_image()
+    # But for the demo, we just load the saved overlay image
+    import cv2
+    overlay = cv2.imread("overlay_dynamic_final.png")
+
+    if overlay is None:
+        print("❌ Error: Could not load 'overlay_dynamic_final.png'")
+        return
+
+    # Show overlay as if it were generated live
+    cv2.imshow("Final Overlay (Demo)", overlay)
+    print("✨ Displaying pre-edited overlay... Press any key to continue.")
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 photo_button.when_pressed = handle_photo_press

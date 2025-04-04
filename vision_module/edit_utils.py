@@ -9,7 +9,9 @@ def edit_mask_interactively(mask_path="mask_dynamic.png", save_path="mask_edited
 
     # Load mask and prep for drawing
     img = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
-    img_color = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    height, width = img.shape
+    img_color = np.zeros((height, width, 3), dtype=np.uint8)  # black background
+
 
     def mouse_events(event, x, y, flags, param):
         nonlocal drawing, erasing, last_point

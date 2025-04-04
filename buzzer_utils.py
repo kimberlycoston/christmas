@@ -3,7 +3,7 @@ from gpiozero import TonalBuzzer, LED
 from gpiozero.tones import Tone
 
 # Define buzzer and LEDs
-buzzer = TonalBuzzer(4)  # GPIO4
+buzzer = TonalBuzzer(26)  # GPIO4
 
 # Tempo and note duration
 tempo = 140

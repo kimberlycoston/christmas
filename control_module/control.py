@@ -52,7 +52,7 @@ def handle_test_press():
 
 def setup_test_button():
     global test_button
-    test_button = Button(22, pull_up=True, pin_factory=factory, bounce_time=0.2)
+    test_button = Button(20, pull_up=True, pin_factory=factory, bounce_time=0.2)
     test_button.when_pressed = handle_test_press
 
 # === FUNCTIONS ===
