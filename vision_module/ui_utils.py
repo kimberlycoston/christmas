@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import colorsys
 from ultralytics import YOLO
+import subprocess
 
 model = YOLO("vision_module/best.pt")
 
@@ -49,6 +50,8 @@ def mouse_callback(event, x, y, flags, param):
             cnt[selected_point_idx][0] = [x, y]
 
 def launch_editor(image, initial_conf=0.6):
+    # Launch on-screen keyboard
+    keyboard_proc = subprocess.Popen(["matchbox-keyboard"])
     global visible_classes, selected_contour_idx, selected_point_idx, is_dragging
     height, width = image.shape[:2]
     window_name = "Preview"
@@ -56,6 +59,7 @@ def launch_editor(image, initial_conf=0.6):
 
     cv2.namedWindow(window_name)
     cv2.createTrackbar("Confidence", window_name, int(initial_conf * 100), 100, lambda x: None)
+
 
     def get_yolo_contours(conf):
         results = model.predict(source=image, conf=conf, verbose=False, task='segment')
@@ -128,6 +132,8 @@ def launch_editor(image, initial_conf=0.6):
         preview = cv2.hconcat([overlay, cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)])
         preview_small = cv2.resize(preview, (0, 0), fx=scale, fy=scale)
         cv2.imshow(window_name, preview_small)
+        if cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE) < 1:
+            break
 
         key = cv2.waitKey(50)
         if key == ord("s"):
@@ -160,5 +166,9 @@ def launch_editor(image, initial_conf=0.6):
                 else:
                     visible_classes.add(cls)
                     print(f"👁️ Showing: {cls}")
+
+    # Close the keyboard after editing
+    if keyboard_proc.poll() is None:  # Still running
+        keyboard_proc.terminate()
 
     cv2.destroyAllWindows()

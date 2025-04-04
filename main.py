@@ -8,6 +8,9 @@ from vision_module.yolo_utils import run_yolo
 from vision_module.capture_utils import capture_image
 from vision_module.ui_utils import launch_editor
 from vision_module.edit_utils import edit_mask_interactively
+from projection import play_animated_projection
+
+
 
 
 import time
@@ -21,14 +24,22 @@ factory = PiGPIOFactory()
 
 # Set up photo button
 photo_button = Button(21, pull_up=True, pin_factory=factory, bounce_time=0.2)
+# Set up test button
+test_button = Button(22, pull_up=True, pin_factory=factory, bounce_time=0.2)
+
 
 def handle_photo_press():
-    print("📷 Button pressed to capture image")
-    lcd_message("📷 Taking picture", "Please wait...")  # <-- ADD THIS LINE
+    print("Button pressed to capture image")
+    lcd_message("Taking picture", "Please wait...")
     image = capture_image()
-    launch_editor(image, initial_conf=0.6)
-    lcd_message("✅ Done!", "Image captured")
+    lcd_message("Done!", "Image captured")
 
+    launch_editor(image, initial_conf=0.6)  # User edits as needed
+
+    # After editing, immediately continue to lights
+    lcd_message("Displaying lights", "Enjoy the show!")
+    print("Starting animated projection")
+    play_animated_projection("mask_dynamic.png", "gifs/colors.gif")
 
 
 photo_button.when_pressed = handle_photo_press
