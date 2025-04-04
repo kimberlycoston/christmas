@@ -24,8 +24,11 @@ photo_button = Button(21, pull_up=True, pin_factory=factory, bounce_time=0.2)
 
 def handle_photo_press():
     print("📷 Button pressed to capture image")
+    lcd_message("📷 Taking picture", "Please wait...")  # <-- ADD THIS LINE
     image = capture_image()
     launch_editor(image, initial_conf=0.6)
+    lcd_message("✅ Done!", "Image captured")
+
 
 
 photo_button.when_pressed = handle_photo_press

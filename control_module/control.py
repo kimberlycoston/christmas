@@ -7,7 +7,7 @@ import adafruit_ds3231
 import threading
 from RPLCD.i2c import CharLCD
 from datetime import datetime, timedelta
-from buzzer_utils import play_melody
+from control_module.buzzer_utils import play_melody
 
 
 # === SETUP ===
